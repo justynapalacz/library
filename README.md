@@ -13,28 +13,33 @@
     ```bash
     git clone https://github.com/justynapalacz/library.git
     ```
+2. Switch to develop branch.
 
-2. Run database script in database client
+    ```bash
+    git checkout develop
+    ```
+   
+3. Run database script in database client
 
     ```bash
     database.sql
     ```
-3. Run schema script in database client
+4. Run schema script in database client
 
     ```bash
     schema.sql
     ```
 
-4. Navigate to the project directory:
+5. Navigate to the project directory:
 
     ```bash
     cd library
     ```
 
-5. Build the project:
+6. Build the project:
 
     ```bash
     mvn clean install
     ```
 
-6. Run application in IntelliJ
+7. Run application in IntelliJ
