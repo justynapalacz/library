@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class BookManager {
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
     public BookManager (SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
@@ -30,7 +30,14 @@ public class BookManager {
         }
     }
 
-
-
-
+    public List<Book> findBookByAuthor(String author) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            List<Book> books = session
+                    .createQuery("FROM Book WHERE author = :author", Book.class)
+                    .setParameter("author", author).list();
+            session.getTransaction().commit();
+            return books;
+        }
+    }
 }
