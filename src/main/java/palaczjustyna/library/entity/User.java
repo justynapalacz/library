@@ -1,15 +1,17 @@
-package palaczjustyna.library;
+package palaczjustyna.library.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@Table (name = "readers")
+@Table (name = "users")
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -26,18 +28,17 @@ public class User {
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
-    public User() {
-    }
+    @OneToMany(mappedBy = "user")
+    private List<Borrow> borrowList;
 
     public User(String firstName, String lastName, Date dateOfBirth) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
     }
-
     @Override
     public String toString() {
-        return "Reader:" +
+        return "User:" +
                 "id:" + id +
                 ", firstName '" + firstName + '\'' +
                 ", lastName '" + lastName + '\'' +

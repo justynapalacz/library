@@ -1,7 +1,11 @@
-package palaczjustyna.library;
+package palaczjustyna.library.manager;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import palaczjustyna.library.entity.Book;
+import palaczjustyna.library.entity.Borrow;
+import palaczjustyna.library.entity.User;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,15 +14,19 @@ import java.util.*;
 public class MenuManager {
    final BookManager bookManager;
    final UserManager userManager;
+   final BorrowManager borrowManager;
+
 
     public MenuManager() {
         SessionFactory factory = new Configuration()
                 .addAnnotatedClass(Book.class)
                 .addAnnotatedClass(User.class)
+                .addAnnotatedClass(Borrow.class)
                 .buildSessionFactory();
 
         bookManager = new BookManager(factory);
         userManager = new UserManager(factory);
+        borrowManager = new BorrowManager(factory);
     }
 
     public void mange() {
@@ -26,14 +34,15 @@ public class MenuManager {
         menuLoop:
         while (true) {
             System.out.println("Hello, please choose action:");
-            System.out.println("Press 1 for adding book ");
-            System.out.println("Press 2 for checking all available books");
-            System.out.println("Press 3 for finding books by author");
-            System.out.println("Press 4 for finding books by  partial author");
-            System.out.println("Press 5 for finding books by title");
-            System.out.println("Press 6 for adding user");
+            System.out.println("Press 1 to adding book ");
+            System.out.println("Press 2 to check all available books");
+            System.out.println("Press 3 to find books by author");
+            System.out.println("Press 4 to find books by  partial author");
+            System.out.println("Press 5 to find books by title");
+            System.out.println("Press 6 to add user");
+            System.out.println("Press 7 to borrow book");
 
-            System.out.println("Press Q for exit");
+            System.out.println("Press Q to exit");
 
             Scanner scanner = new Scanner(System.in);
             String number = scanner.nextLine().toUpperCase();
@@ -56,6 +65,9 @@ public class MenuManager {
                     break;
                 case "6":
                     addUserMenu();
+                    break;
+                case "7":
+                    borrowBookMenu();
                     break;
 
                 case "Q":
@@ -90,21 +102,21 @@ public class MenuManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter author, which books you are looking for: ");
         String author = scanner.nextLine();
-        printResults(bookManager.findBookByAuthor(author));
+        printResults(bookManager.findBooksByAuthor(author));
     }
 
     private void findBookByPartialAuthorMenu() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter part of author  first name/surname, which books you are looking for: ");
+        System.out.println("Please enter part of author first name/surname, which books you are looking for: ");
         String partialAuthor = scanner.nextLine();
-        printResults(bookManager.findBookByPartialAuthor(partialAuthor));
+        printResults(bookManager.findBooksByPartialAuthor(partialAuthor));
     }
 
     private void findBookByTitleMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter title, which you are looking for: ");
         String title = scanner.nextLine();
-        printResults(bookManager.findBookByTitle(title));
+        printResults(bookManager.findBooksByTitle(title));
     }
 
     private void printResults(List<Book> bookManager) {
@@ -116,7 +128,6 @@ public class MenuManager {
             }
         }
     }
-
 
     private void addUserMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -138,6 +149,22 @@ public class MenuManager {
             System.out.println("Wrong date format. Please use format: yyyy-MM-dd. For example: 1985-01-01");
             System.out.println("Please try again");
             addUserMenu();
+        }
+    }
+
+    private void borrowBookMenu() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter user ID: ");
+        int userID = scanner.nextInt();
+        System.out.println("Please enter book ID: ");
+        int bookId = scanner.nextInt();
+        User user = userManager.findUserByID(userID);
+        Book book = bookManager.findBookByID(bookId);
+        Optional<Integer> idBorrow = borrowManager.addBorrow(user, book);
+        if (idBorrow.isEmpty()) {
+            System.out.println("Error! Problem with borrowing a book, please try again!");
+        } else {
+            System.out.println("User: " + user.getId() + " borrowed book " + bookId + ". Transaction nr: " + idBorrow.get());
         }
     }
 

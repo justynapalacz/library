@@ -1,8 +1,8 @@
-package palaczjustyna.library;
+package palaczjustyna.library.manager;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
+import palaczjustyna.library.entity.Book;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -19,7 +19,7 @@ public class BookManager {
     public Optional<Integer> addBook(final String title, final String author) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Integer id = (Integer) session.save(new Book(title, author));
+            Integer id = (Integer) session.save(new Book(title, author, true));
             session.getTransaction().commit();
             return Optional.ofNullable(id);
         }
@@ -34,7 +34,7 @@ public class BookManager {
         }
     }
 
-    public List<Book> findBookByAuthor(final String author) {
+    public List<Book> findBooksByAuthor(final String author) {
         try (Session session = sessionFactory.openSession()) {
             return session
                     .createQuery("FROM Book WHERE author = :author", Book.class)
@@ -42,7 +42,7 @@ public class BookManager {
         }
     }
 
-    public List<Book> findBookByPartialAuthor(final String partialAuthor) {
+    public List<Book> findBooksByPartialAuthor(final String partialAuthor) {
         try (Session session = sessionFactory.openSession()) {
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Book> criteriaQuery = criteriaBuilder.createQuery(Book.class);
@@ -53,7 +53,7 @@ public class BookManager {
         }
     }
 
-    public List<Book> findBookByTitle(final String title) {
+    public List<Book> findBooksByTitle(final String title) {
         try (Session session = sessionFactory.openSession()) {
             return session
                     .createQuery("FROM Book WHERE title = :title", Book.class)
@@ -61,4 +61,9 @@ public class BookManager {
         }
     }
 
+    public Book findBookByID (final int id){
+        try (Session session = sessionFactory.openSession()) {
+            return  session.get(Book.class, id);
+        }
+    }
 }
