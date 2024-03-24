@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import palaczjustyna.library.entity.User;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public class UserManager {
@@ -20,6 +21,15 @@ public class UserManager {
             Integer id = (Integer) session.save(new User(firstName, lastName, dateOfBirth));
             session.getTransaction().commit();
             return Optional.ofNullable(id);
+        }
+    }
+
+    public List<User> getUsers() {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            List<User> users = session.createQuery("FROM User", User.class).list();
+            session.getTransaction().commit();
+            return users;
         }
     }
 

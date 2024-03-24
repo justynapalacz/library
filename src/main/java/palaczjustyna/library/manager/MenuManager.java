@@ -5,6 +5,7 @@ import org.hibernate.cfg.Configuration;
 import palaczjustyna.library.entity.Book;
 import palaczjustyna.library.entity.Borrow;
 import palaczjustyna.library.entity.User;
+import palaczjustyna.library.exceptions.NotAvailableBook;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -33,13 +34,14 @@ public class MenuManager {
 
         menuLoop:
         while (true) {
+            System.out.println("----------------------------");
             System.out.println("Hello, please choose action:");
             System.out.println("Press 1 to adding book ");
-            System.out.println("Press 2 to check all available books");
+            System.out.println("Press 2 to print all books");
             System.out.println("Press 3 to find books by author");
-            System.out.println("Press 4 to find books by  partial author");
-            System.out.println("Press 5 to find books by title");
-            System.out.println("Press 6 to add user");
+            System.out.println("Press 4 to find books by title");
+            System.out.println("Press 5 to add user");
+            System.out.println("Press 6 to print all users");
             System.out.println("Press 7 to borrow book");
             System.out.println("Press 8 to return book");
 
@@ -59,13 +61,13 @@ public class MenuManager {
                     findBookByAuthorMenu();
                     break;
                 case "4":
-                    findBookByPartialAuthorMenu();
-                    break;
-                case "5":
                     findBookByTitleMenu();
                     break;
-                case "6":
+                case "5":
                     addUserMenu();
+                    break;
+                case "6":
+                    getUserMenu();
                     break;
                 case "7":
                     borrowBookMenu();
@@ -93,27 +95,20 @@ public class MenuManager {
         if (idAddedBook.isEmpty()) {
             System.out.println("Error! Book not added, please try again!");
         } else {
-            System.out.println("You added book: " + title + " by " + author + "on position: " + idAddedBook.get());
+            System.out.println("You added book: " + title + " by " + author + " on position: " + idAddedBook.get());
         }
     }
 
     private void getBookMenu() {
-        System.out.println("Available books: ");
+        System.out.println("Books: ");
         printBooks(bookManager.getBooks());
     }
 
     private void findBookByAuthorMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter author, which books you are looking for: ");
-        String author = scanner.nextLine();
-        printBooks(bookManager.findBooksByAuthor(author));
-    }
-
-    private void findBookByPartialAuthorMenu() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter part of author first name/surname, which books you are looking for: ");
         String partialAuthor = scanner.nextLine();
-        printBooks(bookManager.findBooksByPartialAuthor(partialAuthor));
+        printBooks(bookManager.findBooksByAuthor(partialAuthor));
     }
 
     private void findBookByTitleMenu() {
@@ -145,6 +140,10 @@ public class MenuManager {
             addUserMenu();
         }
     }
+    private void getUserMenu() {
+        System.out.println("Users: ");
+        printUsers(userManager.getUsers());
+    }
 
     private void borrowBookMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -153,12 +152,25 @@ public class MenuManager {
         System.out.println("Please enter book ID: ");
         int bookId = scanner.nextInt();
         User user = userManager.findUserByID(userID);
+        if (user==null){
+            System.out.println("User not found. Please try again!");
+            return;
+        }
         Book book = bookManager.findBookByID(bookId);
-        Optional<Integer> idBorrow = borrowManager.addBorrow(user, book);
-        if (idBorrow.isEmpty()) {
-            System.out.println("Error! Problem with borrowing a book, please try again!");
-        } else {
-            System.out.println("User: " + user.getId() + " borrowed book " + bookId + ". Transaction nr: " + idBorrow.get());
+        if (book == null){
+            System.out.println("Book not found. Please try again!");
+            return;
+        }
+
+        try {
+            Optional<Integer> idBorrow = borrowManager.addBorrow(user, book);
+            if (idBorrow.isEmpty()) {
+                System.out.println("Error! Problem with borrowing a book, please try again!");
+            } else {
+                System.out.println("User: " + user.getId() + " borrowed book " + bookId + ". Transaction nr: " + idBorrow.get());
+            }
+        } catch (NotAvailableBook e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -166,11 +178,18 @@ public class MenuManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter user ID: ");
         int userID = scanner.nextInt();
-        printBorrow(borrowManager.getBorrowByUserId(userID));
+        List<Borrow> borrowList = borrowManager.getBorrowByUserId(userID);
+        printBorrow(borrowList);
         System.out.println("Please enter id of the borrowing you wish to return: ");
         int borrowId = scanner.nextInt();
-        borrowManager.returnByBorrowId(borrowId);
-        System.out.println("Success! The book has been returned.");
+        boolean ifExist = borrowList
+                .stream()
+                        .anyMatch( borrow -> borrow.getId()==borrowId);
+        if (ifExist){
+            borrowManager.returnByBorrowId(borrowId);
+            System.out.println("Success! The book has been returned.");
+        }
+        else System.out.println("error");
     }
 
     public Date scanToDate(String input) throws ParseException {
@@ -198,6 +217,16 @@ public class MenuManager {
         } else {
             for (Borrow borrow : borrowManager) {
                 System.out.println(borrow);
+            }
+        }
+    }
+
+    private void printUsers(List<User> userManager) {
+        if (userManager.isEmpty()) {
+            System.out.println("No result. Please try again.");
+        } else {
+            for (User user : userManager) {
+                System.out.println(user);
             }
         }
     }

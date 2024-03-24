@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import palaczjustyna.library.entity.Book;
 import palaczjustyna.library.entity.Borrow;
 import palaczjustyna.library.entity.User;
+import palaczjustyna.library.exceptions.NotAvailableBook;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -20,9 +21,9 @@ public class BorrowManager {
         this.sessionFactory = sessionFactory;
     }
 
-    public Optional<Integer> addBorrow (final User user, final Book book) {
+    public Optional<Integer> addBorrow (final User user, final Book book) throws NotAvailableBook {
         if (!book.isStatus()){
-            return Optional.empty();
+            throw new NotAvailableBook("Book is not available.");
         }
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();

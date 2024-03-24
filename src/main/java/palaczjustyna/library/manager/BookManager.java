@@ -3,7 +3,6 @@ package palaczjustyna.library.manager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import palaczjustyna.library.entity.Book;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -37,19 +36,11 @@ public class BookManager {
 
     public List<Book> findBooksByAuthor(final String author) {
         try (Session session = sessionFactory.openSession()) {
-            return session
-                    .createQuery("FROM Book WHERE author = :author", Book.class)
-                    .setParameter("author", author).list();
-        }
-    }
-
-    public List<Book> findBooksByPartialAuthor(final String partialAuthor) {
-        try (Session session = sessionFactory.openSession()) {
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Book> criteriaQuery = criteriaBuilder.createQuery(Book.class);
             Root<Book> root = criteriaQuery.from(Book.class);
             criteriaQuery.select(root).
-                    where(criteriaBuilder.like(root.get("author"), "%" + partialAuthor + "%"));
+                    where(criteriaBuilder.like(root.get("author"), "%" + author + "%"));
             return session.createQuery(criteriaQuery).list();
         }
     }
