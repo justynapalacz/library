@@ -41,6 +41,7 @@ public class MenuManager {
             System.out.println("Press 5 to find books by title");
             System.out.println("Press 6 to add user");
             System.out.println("Press 7 to borrow book");
+            System.out.println("Press 8 to return book");
 
             System.out.println("Press Q to exit");
 
@@ -69,6 +70,9 @@ public class MenuManager {
                 case "7":
                     borrowBookMenu();
                     break;
+                case "8":
+                    returnBookMenu();
+                    break;
 
                 case "Q":
                     break menuLoop;
@@ -95,38 +99,28 @@ public class MenuManager {
 
     private void getBookMenu() {
         System.out.println("Available books: ");
-        printResults(bookManager.getBooks());
+        printBooks(bookManager.getBooks());
     }
 
     private void findBookByAuthorMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter author, which books you are looking for: ");
         String author = scanner.nextLine();
-        printResults(bookManager.findBooksByAuthor(author));
+        printBooks(bookManager.findBooksByAuthor(author));
     }
 
     private void findBookByPartialAuthorMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter part of author first name/surname, which books you are looking for: ");
         String partialAuthor = scanner.nextLine();
-        printResults(bookManager.findBooksByPartialAuthor(partialAuthor));
+        printBooks(bookManager.findBooksByPartialAuthor(partialAuthor));
     }
 
     private void findBookByTitleMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter title, which you are looking for: ");
         String title = scanner.nextLine();
-        printResults(bookManager.findBooksByTitle(title));
-    }
-
-    private void printResults(List<Book> bookManager) {
-        if (bookManager.isEmpty()) {
-            System.out.println("No result. Please try again.");
-        } else {
-            for (Book book : bookManager) {
-                System.out.println(book);
-            }
-        }
+        printBooks(bookManager.findBooksByTitle(title));
     }
 
     private void addUserMenu() {
@@ -168,12 +162,43 @@ public class MenuManager {
         }
     }
 
+    private void returnBookMenu() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter user ID: ");
+        int userID = scanner.nextInt();
+        printBorrow(borrowManager.getBorrowByUserId(userID));
+        System.out.println("Please enter id of the borrowing you wish to return: ");
+        int borrowId = scanner.nextInt();
+        borrowManager.returnByBorrowId(borrowId);
+        System.out.println("Success! The book has been returned.");
+    }
+
     public Date scanToDate(String input) throws ParseException {
         try (Scanner scanner = new Scanner(input)) {
             String dateString = scanner.nextLine();
             DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
             formatter.setLenient(false);
             return formatter.parse(dateString);
+        }
+    }
+
+    private void printBooks(List<Book> bookManager) {
+        if (bookManager.isEmpty()) {
+            System.out.println("No result. Please try again.");
+        } else {
+            for (Book book : bookManager) {
+                System.out.println(book);
+            }
+        }
+    }
+
+    private void printBorrow(List<Borrow> borrowManager) {
+        if (borrowManager.isEmpty()) {
+            System.out.println("No result. Please try again.");
+        } else {
+            for (Borrow borrow : borrowManager) {
+                System.out.println(borrow);
+            }
         }
     }
 }

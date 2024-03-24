@@ -38,11 +38,11 @@ public class Borrow {
 
     @Override
     public String toString() {
-        return "Borrow" +
+        return "Borrow: " +
                 "id=" + id +
                 ", dateOfBorrow=" + dateOfBorrow +
                 ", dateOfReturn=" + dateOfReturn +
-                ", user=" + user.getLastName() +
+                ", user=" + user.getFirstName() + " " + user.getLastName() +
                 ", book=" + book.getTitle() ;
     }
 }
