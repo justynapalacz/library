@@ -7,10 +7,12 @@ import palaczjustyna.library.entity.Borrow;
 import palaczjustyna.library.entity.User;
 import palaczjustyna.library.exceptions.NotAvailableBook;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 public class MenuManager {
    final BookManager bookManager;
@@ -134,7 +136,7 @@ public class MenuManager {
             } else {
                 System.out.println("You create user " + firstName + " " + lastName + " on position: " + idAddedUser.get());
             }
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             System.out.println("Wrong date format. Please use format: yyyy-MM-dd. For example: 1985-01-01");
             System.out.println("Please try again");
             addUserMenu();
@@ -192,12 +194,11 @@ public class MenuManager {
         else System.out.println("error");
     }
 
-    public Date scanToDate(String input) throws ParseException {
+    public LocalDate scanToDate(String input) throws DateTimeParseException {
         try (Scanner scanner = new Scanner(input)) {
             String dateString = scanner.nextLine();
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-            formatter.setLenient(false);
-            return formatter.parse(dateString);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(dateString, formatter);
         }
     }
 

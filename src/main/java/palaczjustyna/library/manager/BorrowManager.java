@@ -6,10 +6,11 @@ import palaczjustyna.library.entity.Book;
 import palaczjustyna.library.entity.Borrow;
 import palaczjustyna.library.entity.User;
 import palaczjustyna.library.exceptions.NotAvailableBook;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class BorrowManager {
 
             book.setStatus(false);
             session.merge(book);
-            Integer id = (Integer) session.save(new Borrow(user, book, new Date()));
+            Integer id = (Integer) session.save(new Borrow(user, book, LocalDateTime.now()));
 
             session.getTransaction().commit();
             return Optional.ofNullable(id);
@@ -58,7 +59,7 @@ public class BorrowManager {
 
             Borrow borrow = session.get(Borrow.class, id);
             borrow.getBook().setStatus(true);
-            borrow.setDateOfReturn(new Date());
+            borrow.setDateOfReturn(LocalDateTime.now());
 
             session.merge(borrow);
             session.getTransaction().commit();

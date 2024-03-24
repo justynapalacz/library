@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS borrow (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNSIGNED NOT NULL,
   book_id INT UNSIGNED NOT NULL,
-  date_of_borrow DATE NOT NULL,
-  date_of_return DATE,
+  date_of_borrow DATETIME NOT NULL,
+  date_of_return DATETIME,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (book_id) REFERENCES books(id)
 );

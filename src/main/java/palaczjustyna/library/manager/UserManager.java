@@ -4,7 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import palaczjustyna.library.entity.User;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public class UserManager {
         this.sessionFactory = sessionFactory;
     }
 
-    public Optional<Integer> addUser(final String firstName, final String lastName, Date dateOfBirth) {
+    public Optional<Integer> addUser(final String firstName, final String lastName, LocalDate dateOfBirth) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Integer id = (Integer) session.save(new User(firstName, lastName, dateOfBirth));
