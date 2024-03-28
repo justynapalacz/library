@@ -40,6 +40,7 @@ public class BorrowManager {
 
     public List<Borrow> getBorrowByUserId (final int userId){
         try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Borrow> criteriaQuery = criteriaBuilder.createQuery(Borrow.class);
             Root<Borrow> root = criteriaQuery.from(Borrow.class);
@@ -49,7 +50,9 @@ public class BorrowManager {
                                     criteriaBuilder.isNull(root.get("dateOfReturn"))
                             )
                     );
-            return  session.createQuery(criteriaQuery).list();
+            List<Borrow> borrowList = session.createQuery(criteriaQuery).list();
+            session.getTransaction().commit();
+            return  borrowList;
         }
     }
 

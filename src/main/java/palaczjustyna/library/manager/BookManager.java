@@ -36,26 +36,35 @@ public class BookManager {
 
     public List<Book> findBooksByAuthor(final String author) {
         try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Book> criteriaQuery = criteriaBuilder.createQuery(Book.class);
             Root<Book> root = criteriaQuery.from(Book.class);
             criteriaQuery.select(root).
                     where(criteriaBuilder.like(root.get("author"), "%" + author + "%"));
-            return session.createQuery(criteriaQuery).list();
+            List<Book> bookList =  session.createQuery(criteriaQuery).list();
+            session.getTransaction().commit();
+            return bookList;
         }
     }
 
     public List<Book> findBooksByTitle(final String title) {
         try (Session session = sessionFactory.openSession()) {
-            return session
+            session.beginTransaction();
+            List<Book> bookList = session
                     .createQuery("FROM Book WHERE title = :title", Book.class)
                     .setParameter("title", title).list();
+            session.getTransaction().commit();
+            return bookList;
         }
     }
 
     public Book findBookByID(final int id) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(Book.class, id);
+            session.beginTransaction();
+            Book book = session.get(Book.class, id);
+            session.getTransaction().commit();
+            return book;
         }
     }
 }

@@ -35,7 +35,10 @@ public class UserManager {
 
     public User findUserByID (final int id){
         try (Session session = sessionFactory.openSession()) {
-            return  session.get(User.class, id);
+            session.beginTransaction();
+            User user = session.get(User.class, id);
+            session.getTransaction().commit();
+            return  user;
         }
     }
 }
